@@ -1,0 +1,7 @@
+tests:
+  - name: reads normal configuration
+    events:
+      - {api_group: "", resource: configmaps, verb: get, namespace: payments, resource_name: app-config}
+  - name: reads failover configuration
+    events:
+      - {api_group: "", resource: configmaps, verb: get, namespace: payments, resource_name: failover-config}

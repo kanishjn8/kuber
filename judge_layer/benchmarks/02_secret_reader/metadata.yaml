@@ -1,0 +1,4 @@
+name: Secret reader
+description: Named Secret access is retained while broad secret listing is removed.
+service_account: secret-reader
+namespace: payments

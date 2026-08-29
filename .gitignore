@@ -1,0 +1,40 @@
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# Coverage and build output
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Local environments and secrets
+.venv/
+.env
+.env.*
+!.env.example
+.kube/
+kubeconfig
+kubeconfig.*
+
+# Editors, operating systems, and logs
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.log
+
+# Generated Kuber output
+artifacts/trajectories/*.jsonl
+artifacts/trajectories/*.md
+artifacts/evaluation/*.json
+artifacts/evaluation/*.csv
+artifacts/evaluation/report.md
+artifacts/policies/*.yaml

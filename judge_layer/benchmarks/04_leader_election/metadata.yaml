@@ -1,0 +1,4 @@
+name: Leader election
+description: A less-common leader renewal requires Lease update.
+service_account: leader
+namespace: controllers

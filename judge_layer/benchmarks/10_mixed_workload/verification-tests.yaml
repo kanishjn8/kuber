@@ -1,0 +1,17 @@
+tests:
+  - name: starts with configuration and secret
+    events:
+      - {api_group: "", resource: configmaps, verb: get, namespace: payments, resource_name: app-config}
+      - {api_group: "", resource: secrets, verb: get, namespace: payments, resource_name: payment-secret}
+  - name: discovers pods
+    events:
+      - {api_group: "", resource: pods, verb: list, namespace: payments}
+  - name: reconciles a payment job
+    events:
+      - {api_group: batch, resource: jobs, verb: create, namespace: payments, resource_name: reconcile-2}
+      - {api_group: batch, resource: jobs, verb: get, namespace: payments, resource_name: reconcile-2}
+      - {api_group: batch, resource: jobs, verb: delete, namespace: payments, resource_name: reconcile-2}
+  - name: performs hidden leader election
+    events:
+      - {api_group: coordination.k8s.io, resource: leases, verb: create, namespace: payments, resource_name: payment-controller}
+      - {api_group: coordination.k8s.io, resource: leases, verb: update, namespace: payments, resource_name: payment-controller}

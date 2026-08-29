@@ -1,0 +1,3 @@
+[
+  {"api_group": "", "resource": "services", "verb": "get", "namespace": "storefront", "resource_name": "catalog"}
+]

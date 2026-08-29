@@ -1,0 +1,4 @@
+tests:
+  - name: reads application configuration
+    events:
+      - {api_group: "", resource: configmaps, verb: get, namespace: payments, resource_name: app-config}

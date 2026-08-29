@@ -1,0 +1,4 @@
+tests:
+  - name: lists team pods
+    events:
+      - {api_group: "", resource: pods, verb: list, namespace: team-a}

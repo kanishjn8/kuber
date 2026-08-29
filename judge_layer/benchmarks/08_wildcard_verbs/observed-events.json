@@ -1,0 +1,3 @@
+[
+  {"api_group": "", "resource": "pods", "verb": "get", "namespace": "operations", "resource_name": "worker-0"}
+]

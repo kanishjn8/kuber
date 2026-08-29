@@ -1,0 +1,4 @@
+name: Config reader
+description: Named ConfigMap read with no hidden path.
+service_account: config-reader
+namespace: payments

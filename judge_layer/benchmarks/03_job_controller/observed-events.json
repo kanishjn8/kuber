@@ -1,0 +1,3 @@
+[
+  {"api_group": "batch", "resource": "jobs", "verb": "get", "namespace": "batch-team", "resource_name": "reconcile-1"}
+]

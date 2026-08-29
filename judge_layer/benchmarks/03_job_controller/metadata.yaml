@@ -1,0 +1,4 @@
+name: Job controller
+description: Reconciliation creates and deletes Jobs beyond the observed status read.
+service_account: job-controller
+namespace: batch-team

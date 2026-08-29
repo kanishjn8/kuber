@@ -1,0 +1,7 @@
+tests:
+  - name: observes leader lease
+    events:
+      - {api_group: coordination.k8s.io, resource: leases, verb: get, namespace: controllers, resource_name: app-leader}
+  - name: renews leadership
+    events:
+      - {api_group: coordination.k8s.io, resource: leases, verb: update, namespace: controllers, resource_name: app-leader}

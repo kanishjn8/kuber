@@ -1,0 +1,7 @@
+tests:
+  - name: reads worker
+    events:
+      - {api_group: "", resource: pods, verb: get, namespace: operations, resource_name: worker-0}
+  - name: annotates worker during failover
+    events:
+      - {api_group: "", resource: pods, verb: patch, namespace: operations, resource_name: worker-0}

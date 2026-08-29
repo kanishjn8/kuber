@@ -1,0 +1,6 @@
+[
+  {"api_group": "", "resource": "configmaps", "verb": "get", "namespace": "payments", "resource_name": "app-config"},
+  {"api_group": "", "resource": "secrets", "verb": "get", "namespace": "payments", "resource_name": "payment-secret"},
+  {"api_group": "", "resource": "pods", "verb": "list", "namespace": "payments"},
+  {"api_group": "batch", "resource": "jobs", "verb": "get", "namespace": "payments", "resource_name": "reconcile-1"}
+]

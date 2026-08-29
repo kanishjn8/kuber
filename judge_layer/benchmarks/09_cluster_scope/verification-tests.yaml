@@ -1,0 +1,7 @@
+tests:
+  - name: reads catalog service
+    events:
+      - {api_group: "", resource: services, verb: get, namespace: storefront, resource_name: catalog}
+  - name: discovers peer services
+    events:
+      - {api_group: "", resource: services, verb: list, namespace: storefront}

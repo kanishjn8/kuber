@@ -1,0 +1,17 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata: {name: minimum, namespace: payments}
+rules:
+  - {apiGroups: [""], resources: [configmaps], verbs: [get], resourceNames: [app-config]}
+  - {apiGroups: [""], resources: [secrets], verbs: [get], resourceNames: [payment-secret]}
+  - {apiGroups: [""], resources: [pods], verbs: [list]}
+  - {apiGroups: [batch], resources: [jobs], verbs: [create]}
+  - {apiGroups: [batch], resources: [jobs], verbs: [get, delete], resourceNames: [reconcile-1, reconcile-2]}
+  - {apiGroups: [coordination.k8s.io], resources: [leases], verbs: [create]}
+  - {apiGroups: [coordination.k8s.io], resources: [leases], verbs: [update], resourceNames: [payment-controller]}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata: {name: minimum, namespace: payments}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: minimum}
+subjects: [{kind: ServiceAccount, name: payment-controller, namespace: payments}]

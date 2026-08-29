@@ -1,0 +1,4 @@
+name: Mixed payment controller
+description: Challenging mixed workload with secrets, Jobs, Pods, and hidden leader election.
+service_account: payment-controller
+namespace: payments

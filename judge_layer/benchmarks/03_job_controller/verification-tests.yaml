@@ -1,0 +1,8 @@
+tests:
+  - name: reads an existing job
+    events:
+      - {api_group: batch, resource: jobs, verb: get, namespace: batch-team, resource_name: reconcile-1}
+  - name: performs reconciliation
+    events:
+      - {api_group: batch, resource: jobs, verb: create, namespace: batch-team, resource_name: reconcile-2}
+      - {api_group: batch, resource: jobs, verb: delete, namespace: batch-team, resource_name: reconcile-2}

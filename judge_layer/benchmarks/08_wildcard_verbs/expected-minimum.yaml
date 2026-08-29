@@ -1,0 +1,11 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata: {name: minimum, namespace: operations}
+rules:
+  - {apiGroups: [""], resources: [pods], verbs: [get, patch], resourceNames: [worker-0]}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata: {name: minimum, namespace: operations}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: minimum}
+subjects: [{kind: ServiceAccount, name: pod-annotator, namespace: operations}]

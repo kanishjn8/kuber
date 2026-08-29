@@ -1,0 +1,3 @@
+[
+  {"api_group": "", "resource": "secrets", "verb": "get", "namespace": "payments", "resource_name": "payment-secret"}
+]

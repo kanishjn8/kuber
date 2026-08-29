@@ -1,0 +1,4 @@
+name: Cluster scope removal
+description: A cluster binding is replaced by a namespace Role for Service discovery.
+service_account: service-reader
+namespace: storefront

@@ -1,0 +1,4 @@
+name: Wildcard verb elimination
+description: Broad verbs become exact read and named patch capabilities.
+service_account: pod-annotator
+namespace: operations

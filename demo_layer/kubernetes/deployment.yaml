@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-controller
+  namespace: kuber-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: payment-controller}
+  template:
+    metadata:
+      labels: {app: payment-controller}
+    spec:
+      serviceAccountName: payment-controller
+      containers:
+        - name: payment-controller
+          image: kuber-payment-controller:dev
+          imagePullPolicy: Never
+          ports: [{containerPort: 8080}]
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef: {fieldPath: metadata.namespace}
+          readinessProbe:
+            httpGet: {path: /healthz, port: 8080}
+            initialDelaySeconds: 2
+            periodSeconds: 2

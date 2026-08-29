@@ -1,0 +1,3 @@
+[
+  {"api_group": "coordination.k8s.io", "resource": "leases", "verb": "get", "namespace": "controllers", "resource_name": "app-leader"}
+]

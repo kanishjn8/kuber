@@ -1,0 +1,4 @@
+name: Namespace scope reduction
+description: Cluster-wide Pod access is safely reduced to one namespace.
+service_account: pod-reader
+namespace: team-a

@@ -1,0 +1,4 @@
+name: Resource name refinement
+description: Verification reveals a second legitimate named ConfigMap without granting all names.
+service_account: named-reader
+namespace: payments

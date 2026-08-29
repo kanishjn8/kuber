@@ -1,0 +1,7 @@
+tests:
+  - name: normal startup
+    events:
+      - {api_group: "", resource: configmaps, verb: get, namespace: payments, resource_name: app-config}
+  - name: diagnostic discovery
+    events:
+      - {api_group: "", resource: configmaps, verb: list, namespace: payments}

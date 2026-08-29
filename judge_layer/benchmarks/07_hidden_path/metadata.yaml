@@ -1,0 +1,4 @@
+name: Hidden list path
+description: Observed privilege is insufficient because a legitimate diagnostic path lists ConfigMaps.
+service_account: hidden-path
+namespace: payments
