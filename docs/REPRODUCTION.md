@@ -64,8 +64,6 @@ Kuber:
 14 / 14 scenarios remain functional
 ```
 
-The exact generated numbers should be read from the current evaluation artifacts rather than copied manually.
-
 Generated output is written under:
 
 ```text

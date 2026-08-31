@@ -254,7 +254,6 @@ The bundled adapter should not be treated as production infrastructure.
 - [Reproduction guide](docs/REPRODUCTION.md)
 - [Agent trajectories](docs/AGENT_TRAJECTORIES.md)
 - [Reference sandbox](docs/DEMO_GUIDE.md)
-- [Video script](docs/VIDEO_SCRIPT.md)
 
 ## Repository layout
 
