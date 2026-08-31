@@ -43,7 +43,9 @@ def load_benchmark(path: Path) -> BenchmarkCase:
     observed = tuple(KubeEvent.from_dict(item) for item in observed_raw)
     verification_raw = _load_yaml(path / "verification-tests.yaml")
     tests = tuple(
-        VerificationTest(item["name"], tuple(KubeEvent.from_dict(event) for event in item["events"]))
+        VerificationTest(
+            item["name"], tuple(KubeEvent.from_dict(event) for event in item["events"])
+        )
         for item in verification_raw["tests"]
     )
     expected_path = path / "expected-minimum.yaml"
@@ -52,5 +54,6 @@ def load_benchmark(path: Path) -> BenchmarkCase:
         if expected_path.exists() and expected_path.read_text(encoding="utf-8").strip()
         else None
     )
-    return BenchmarkCase(path.name, metadata["name"], metadata["description"], initial, observed, tests, expected)
-
+    return BenchmarkCase(
+        path.name, metadata["name"], metadata["description"], initial, observed, tests, expected
+    )

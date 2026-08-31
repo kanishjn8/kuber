@@ -1,0 +1,60 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: api-gateway-overprivileged, namespace: kuber-sandbox}
+rules:
+  - {apiGroups: [""], resources: [configmaps, services], verbs: [get, list, watch, create, update, patch, delete]}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: api-gateway-overprivileged, namespace: kuber-sandbox}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: api-gateway-overprivileged}
+subjects: [{kind: ServiceAccount, name: api-gateway-sa, namespace: kuber-sandbox}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: auth-service-overprivileged, namespace: kuber-sandbox}
+rules:
+  - {apiGroups: [""], resources: [secrets, configmaps], verbs: [get, list, watch, create, update, patch, delete]}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: auth-service-overprivileged, namespace: kuber-sandbox}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: auth-service-overprivileged}
+subjects: [{kind: ServiceAccount, name: auth-service-sa, namespace: kuber-sandbox}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: order-service-overprivileged, namespace: kuber-sandbox}
+rules:
+  - {apiGroups: [""], resources: [configmaps], verbs: [get, list, watch, create, update, patch, delete]}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: order-service-overprivileged, namespace: kuber-sandbox}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: order-service-overprivileged}
+subjects: [{kind: ServiceAccount, name: order-service-sa, namespace: kuber-sandbox}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: payment-service-overprivileged, namespace: kuber-sandbox}
+rules:
+  - {apiGroups: [""], resources: [secrets, configmaps, pods], verbs: [get, list, watch, create, update, patch, delete]}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: payment-service-overprivileged, namespace: kuber-sandbox}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: payment-service-overprivileged}
+subjects: [{kind: ServiceAccount, name: payment-service-sa, namespace: kuber-sandbox}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: worker-service-overprivileged, namespace: kuber-sandbox}
+rules:
+  - {apiGroups: [""], resources: [configmaps], verbs: [get, list, watch, create, update, patch, delete]}
+  - {apiGroups: [batch], resources: [jobs], verbs: [get, list, watch, create, update, patch, delete]}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: worker-service-overprivileged, namespace: kuber-sandbox}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: worker-service-overprivileged}
+subjects: [{kind: ServiceAccount, name: worker-service-sa, namespace: kuber-sandbox}]

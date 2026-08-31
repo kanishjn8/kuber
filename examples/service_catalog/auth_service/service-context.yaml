@@ -1,0 +1,6 @@
+service_id: auth-service
+language: Python
+entry_point: service.py
+verification_profile: auth-service
+dependencies: []
+kubernetes_usage: [get core/configmaps/app-config, get core/secrets/auth-secret]

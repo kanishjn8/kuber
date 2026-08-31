@@ -1,0 +1,12 @@
+workers: 3
+cases:
+  - 01_config_reader
+  - 02_secret_reader
+  - 03_job_controller
+  - 04_leader_election
+  - 05_namespace_scope
+  - 06_resource_name
+  - 07_hidden_path
+  - 08_wildcard_verbs
+  - 09_cluster_scope
+  - 10_mixed_workload

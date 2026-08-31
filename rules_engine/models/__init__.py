@@ -5,12 +5,12 @@ from rules_engine.models.rbac import BindingObject, ParsedRbac, RoleObject, Serv
 from rules_engine.models.workload import ServiceAccountRef, WorkloadRef
 
 __all__ = [
+    "BindingObject",
     "KubeEvent",
+    "ParsedRbac",
     "Permission",
     "Policy",
     "PolicyRule",
-    "BindingObject",
-    "ParsedRbac",
     "RoleObject",
     "ServiceAccountObject",
     "ServiceAccountRef",

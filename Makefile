@@ -1,24 +1,57 @@
-.PHONY: test evaluate demo-check demo-up demo demo-reset demo-down
-
-PYTHON ?= uv run python
+.PHONY: test test-llm coverage lint typecheck quality build evaluate evaluate-summary experiment-context experiment-workers sandbox-check sandbox-build sandbox-up sandbox-run sandbox-status sandbox-reset sandbox-down
 
 test:
-	$(PYTHON) -m pytest
+	uv run --extra kubernetes pytest tests examples/reference_workload/tests
+
+test-llm:
+	uv run python -m kuber_cli.llm_diagnostic
+
+coverage:
+	uv run --extra kubernetes pytest tests examples/reference_workload/tests --cov=rules_engine --cov=agent_layer --cov=event_layer --cov=context_layer --cov=judge_layer --cov=kuber_cli --cov=kubernetes_runtime --cov=reference_workload --cov-report=term-missing
+
+lint:
+	uv run ruff check .
+	uv run ruff format --check .
+	bash -n deploy/kind/scripts/*.sh
+
+typecheck:
+	uv run --extra kubernetes mypy rules_engine agent_layer event_layer context_layer judge_layer kubernetes_runtime kuber_cli examples/reference_workload/src/reference_workload
+
+quality: lint typecheck coverage
+
+build:
+	uv build
+	uv build --project examples/reference_workload
 
 evaluate:
-	$(PYTHON) -m judge_layer.evaluation.runner
+	uv run kuber evaluate
 
-demo-check:
-	./demo_layer/scripts/check-prerequisites.sh
+evaluate-summary:
+	uv run kuber evaluate --summary-only
 
-demo-up: demo-check
-	./demo_layer/scripts/setup.sh
+experiment-context:
+	uv run kuber experiment-context
 
-demo:
-	$(PYTHON) -m kuber.cli demo
+experiment-workers:
+	uv run --extra kubernetes kuber experiment-workers
 
-demo-reset:
-	./demo_layer/scripts/reset.sh
+sandbox-check:
+	./deploy/kind/scripts/check-prerequisites.sh
 
-demo-down:
-	./demo_layer/scripts/cleanup.sh
+sandbox-build:
+	docker build -t kuber-reference-workload:dev examples/reference_workload
+
+sandbox-up: sandbox-check
+	./deploy/kind/scripts/setup.sh
+
+sandbox-run:
+	uv run --extra kubernetes kuber optimize
+
+sandbox-status:
+	./deploy/kind/scripts/status.sh
+
+sandbox-reset:
+	./deploy/kind/scripts/reset.sh
+
+sandbox-down:
+	./deploy/kind/scripts/cleanup.sh

@@ -1,0 +1,9 @@
+service_id: payment-service
+language: Python
+entry_point: service.py
+verification_profile: payment-service
+dependencies: [order-service]
+kubernetes_usage:
+  - get core/configmaps/app-config
+  - get core/secrets/payment-secret
+  - list core/pods

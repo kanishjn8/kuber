@@ -1,0 +1,10 @@
+service_id: worker-service
+language: Python
+entry_point: service.py
+verification_profile: worker-service
+dependencies: [order-service]
+kubernetes_usage:
+  - get core/configmaps/app-config
+  - create batch/jobs
+  - get batch/jobs
+  - delete batch/jobs

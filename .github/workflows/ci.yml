@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v9
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - name: Install locked dependencies
+        run: uv sync --locked --extra kubernetes
+      - name: Lint, type-check, and test all Python components
+        run: make quality
+      - name: Build both Python distributions
+        run: make build
+      - name: Run deterministic evaluation
+        run: make evaluate-summary
+      - name: Upload generated evaluation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kuber-evaluation
+          path: |
+            artifacts/evaluation/
+            artifacts/trajectories/
+          if-no-files-found: error

@@ -35,4 +35,3 @@ class ParsedRbac:
     service_accounts: tuple[ServiceAccountObject, ...] = field(default_factory=tuple)
     roles: tuple[RoleObject, ...] = field(default_factory=tuple)
     bindings: tuple[BindingObject, ...] = field(default_factory=tuple)
-

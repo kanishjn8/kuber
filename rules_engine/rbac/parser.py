@@ -37,7 +37,11 @@ def _strings(value: Any, field: str, *, allow_empty_string: bool = False) -> tup
 
 def _metadata(document: Mapping[str, Any]) -> tuple[str, str | None]:
     metadata = document.get("metadata")
-    if not isinstance(metadata, Mapping) or not isinstance(metadata.get("name"), str):
+    if (
+        not isinstance(metadata, Mapping)
+        or not isinstance(metadata.get("name"), str)
+        or not metadata["name"]
+    ):
         raise RbacParseError("every RBAC object requires metadata.name")
     namespace = metadata.get("namespace")
     if namespace is not None and not isinstance(namespace, str):
@@ -55,7 +59,10 @@ def _rules(value: Any) -> tuple[PolicyRule, ...]:
         api_groups = _strings(raw.get("apiGroups", [""]), "apiGroups", allow_empty_string=True)
         resources = _strings(raw.get("resources"), "resources")
         verbs = _strings(raw.get("verbs"), "verbs")
-        resource_names = tuple(raw.get("resourceNames", ()))
+        raw_resource_names = raw.get("resourceNames", [])
+        if not isinstance(raw_resource_names, list):
+            raise RbacParseError("resourceNames must be a list")
+        resource_names = tuple(raw_resource_names)
         if not all(isinstance(item, str) and item for item in resource_names):
             raise RbacParseError("resourceNames entries must be non-empty strings")
         for verb in verbs:
@@ -64,7 +71,9 @@ def _rules(value: Any) -> tuple[PolicyRule, ...]:
         for group in api_groups:
             for resource in resources:
                 if not is_supported_resource(group, resource):
-                    raise UnsupportedResourceError(f"unsupported resource: {group or 'core'}/{resource}")
+                    raise UnsupportedResourceError(
+                        f"unsupported resource: {group or 'core'}/{resource}"
+                    )
         result.append(PolicyRule(api_groups, resources, verbs, resource_names))
     return tuple(result)
 
@@ -119,22 +128,45 @@ def parse_rbac(source: str | Path | Iterable[Mapping[str, Any]]) -> ParsedRbac:
         elif kind in {"Role", "ClusterRole"}:
             if kind == "Role" and not namespace:
                 raise RbacParseError("Role requires metadata.namespace")
-            roles.append(RoleObject(name, namespace if kind == "Role" else None, _rules(document.get("rules", [])), kind == "ClusterRole"))
+            roles.append(
+                RoleObject(
+                    name,
+                    namespace if kind == "Role" else None,
+                    _rules(document.get("rules", [])),
+                    kind == "ClusterRole",
+                )
+            )
         else:
             if kind == "RoleBinding" and not namespace:
                 raise RbacParseError("RoleBinding requires metadata.namespace")
             role_ref = document.get("roleRef")
-            if not isinstance(role_ref, Mapping) or role_ref.get("kind") not in {"Role", "ClusterRole"} or not isinstance(role_ref.get("name"), str):
+            if (
+                not isinstance(role_ref, Mapping)
+                or role_ref.get("apiGroup") != "rbac.authorization.k8s.io"
+                or role_ref.get("kind") not in {"Role", "ClusterRole"}
+                or not isinstance(role_ref.get("name"), str)
+                or not role_ref["name"]
+            ):
                 raise RbacParseError("binding requires a valid roleRef")
+            if kind == "ClusterRoleBinding" and role_ref["kind"] != "ClusterRole":
+                raise RbacParseError("ClusterRoleBinding must reference a ClusterRole")
             subjects: list[ServiceAccountRef] = []
-            for subject in document.get("subjects", []):
+            raw_subjects = document.get("subjects", [])
+            if not isinstance(raw_subjects, list):
+                raise RbacParseError("binding subjects must be a list")
+            for subject in raw_subjects:
                 if not isinstance(subject, Mapping):
                     raise RbacParseError("binding subjects must be mappings")
                 if subject.get("kind") != "ServiceAccount":
                     continue
                 subject_name = subject.get("name")
                 subject_namespace = subject.get("namespace") or namespace
-                if not isinstance(subject_name, str) or not isinstance(subject_namespace, str):
+                if (
+                    not isinstance(subject_name, str)
+                    or not subject_name
+                    or not isinstance(subject_namespace, str)
+                    or not subject_namespace
+                ):
                     raise RbacParseError("ServiceAccount subjects require name and namespace")
                 subjects.append(ServiceAccountRef(subject_name, subject_namespace))
             bindings.append(
@@ -148,4 +180,3 @@ def parse_rbac(source: str | Path | Iterable[Mapping[str, Any]]) -> ParsedRbac:
                 )
             )
     return ParsedRbac(tuple(service_accounts), tuple(roles), tuple(bindings))
-

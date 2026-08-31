@@ -7,9 +7,12 @@ from agent_layer.trajectory.models import TrajectoryEvent
 
 
 class TrajectoryRecorder:
-    def __init__(self, run_id: str, directory: Path | None = None) -> None:
+    def __init__(
+        self, run_id: str, directory: Path | None = None, *, file_stem: str | None = None
+    ) -> None:
         self.run_id = run_id
         self.directory = directory
+        self.file_stem = file_stem or run_id
         self.events: list[TrajectoryEvent] = []
         self._started = False
 
@@ -17,7 +20,7 @@ class TrajectoryRecorder:
         self.events.append(event)
         if self.directory is not None:
             self.directory.mkdir(parents=True, exist_ok=True)
-            path = self.directory / f"{self.run_id}.jsonl"
+            path = self.directory / f"{self.file_stem}.jsonl"
             with path.open("a" if self._started else "w", encoding="utf-8") as handle:
                 handle.write(json.dumps(event.to_dict(), sort_keys=True) + "\n")
             self._started = True
@@ -25,7 +28,7 @@ class TrajectoryRecorder:
     def write_summary(self) -> Path | None:
         if self.directory is None:
             return None
-        path = self.directory / f"{self.run_id}.md"
+        path = self.directory / f"{self.file_stem}.md"
         lines = [f"# Kuber trajectory: {self.run_id}", ""]
         lines.extend(
             f"{index}. **{event.agent} / {event.action}** — {event.reason}"

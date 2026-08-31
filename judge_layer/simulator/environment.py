@@ -34,7 +34,9 @@ class SimulatorEnvironment:
         denied: list[KubeEvent] = []
         passed = 0
         for test in self.case.verification_tests:
-            test_denials = [event for event in test.events if not is_authorized(self._current_policy, event)]
+            test_denials = [
+                event for event in test.events if not is_authorized(self._current_policy, event)
+            ]
             if test_denials:
                 denied.extend(test_denials)
             else:
@@ -61,4 +63,3 @@ class SimulatorEnvironment:
                 authorization_denial=True,
             )
         return FailureDescription(result.stderr or "verification failed without an RBAC denial")
-

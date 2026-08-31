@@ -14,4 +14,3 @@ __all__ = [
     "policy_to_yaml",
     "resolve_effective_policy",
 ]
-

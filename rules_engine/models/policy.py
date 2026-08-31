@@ -30,7 +30,7 @@ class Policy:
         )
         object.__setattr__(self, "permissions", ordered)
 
-    def with_permissions(self, permissions: list[Permission] | tuple[Permission, ...]) -> "Policy":
+    def with_permissions(self, permissions: list[Permission] | tuple[Permission, ...]) -> Policy:
         return Policy(
             permissions=tuple(permissions),
             name=self.name,

@@ -1,6 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from typing import TypedDict
+
+
+class CaseResultRow(TypedDict):
+    id: str
+    name: str
+    baseline: dict[str, object]
+    kuber: dict[str, object]
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,13 +58,18 @@ def summarize(values: list[SystemCaseMetrics]) -> EvaluationSummary:
         cases=count,
         functional_successes=successes,
         functional_success_rate=100 * successes / count,
-        average_validated_risk_reduction=sum(item.validated_risk_reduction for item in values) / count,
-        average_raw_permission_reduction=sum(item.raw_permission_reduction_percent for item in values) / count,
+        average_validated_risk_reduction=sum(item.validated_risk_reduction for item in values)
+        / count,
+        average_raw_permission_reduction=sum(
+            item.raw_permission_reduction_percent for item in values
+        )
+        / count,
         average_risk_reduction=sum(item.risk_reduction_percent for item in values) / count,
-        high_risk_permissions_remaining=sum(item.high_risk_permissions_remaining for item in values),
+        high_risk_permissions_remaining=sum(
+            item.high_risk_permissions_remaining for item in values
+        ),
         cluster_wide_grants_remaining=sum(item.cluster_wide_grants_remaining for item in values),
         incorrect_removals=sum(item.incorrect_removals for item in values),
         repair_iterations=sum(item.repair_iterations for item in values),
         average_runtime_seconds=sum(item.runtime_seconds for item in values) / count,
     )
-

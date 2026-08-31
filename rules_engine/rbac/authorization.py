@@ -42,4 +42,3 @@ def authorize(policy: Policy, event: KubeEvent) -> AuthorizationDecision:
 
 def is_authorized(policy: Policy, event: KubeEvent) -> bool:
     return authorize(policy, event).allowed
-

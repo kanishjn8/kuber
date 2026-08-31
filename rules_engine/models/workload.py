@@ -12,4 +12,3 @@ class WorkloadRef:
     name: str
     namespace: str
     service_account: ServiceAccountRef
-

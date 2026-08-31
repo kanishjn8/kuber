@@ -1,0 +1,6 @@
+service_id: api-gateway
+language: Python
+entry_point: service.py
+verification_profile: api-gateway
+dependencies: [auth-service, order-service]
+kubernetes_usage: [get core/configmaps/app-config]

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: kuber-sandbox
+data:
+  payment_mode: sandbox
+  gateway_routes: auth-service,order-service
+  order_mode: sandbox

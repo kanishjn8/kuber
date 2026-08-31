@@ -6,7 +6,11 @@ from rules_engine.rbac.authorization import is_authorized
 
 
 def test_observed_only_restricts_named_get_but_not_list() -> None:
-    current = Policy((Permission("", "*", "*", "payments"),), service_account="app", service_account_namespace="payments")
+    current = Policy(
+        (Permission("", "*", "*", "payments"),),
+        service_account="app",
+        service_account_namespace="payments",
+    )
     observed = (
         KubeEvent("", "configmaps", "get", "payments", "app-config"),
         KubeEvent("", "pods", "list", "payments"),
@@ -21,7 +25,9 @@ def test_observed_only_restricts_named_get_but_not_list() -> None:
 
 def test_repair_restores_only_originally_authorized_hidden_path() -> None:
     current = Policy((Permission("", "configmaps", "*", "payments"),))
-    candidate = observed_only_policy(current, (KubeEvent("", "configmaps", "get", "payments", "app-config"),))
+    candidate = observed_only_policy(
+        current, (KubeEvent("", "configmaps", "get", "payments", "app-config"),)
+    )
     hidden = KubeEvent("", "configmaps", "list", "payments")
     repaired = repair_policy(candidate, (hidden,), current)
     assert is_authorized(repaired, hidden)
@@ -34,3 +40,11 @@ def test_unused_candidate_reductions_are_risk_ordered() -> None:
     reductions = candidate_reductions(current, ())
     assert reductions[0].risk_value >= reductions[-1].risk_value
 
+
+def test_reducer_rejects_events_outside_the_supported_mvp() -> None:
+    current = Policy((Permission("*", "*", "*", None),))
+    with pytest.raises(ValueError, match="unsupported observed resource"):
+        observed_only_policy(
+            current,
+            (KubeEvent("example.io", "widgets", "get", "payments", "one"),),
+        )

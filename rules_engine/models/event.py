@@ -11,15 +11,17 @@ class KubeEvent:
     verb: str
     namespace: str | None = None
     resource_name: str | None = None
+    workload_id: str | None = None
 
     @classmethod
-    def from_dict(cls, value: dict[str, Any]) -> "KubeEvent":
+    def from_dict(cls, value: dict[str, Any]) -> KubeEvent:
         return cls(
             api_group=str(value.get("api_group", "")),
             resource=str(value["resource"]),
             verb=str(value["verb"]),
             namespace=value.get("namespace"),
             resource_name=value.get("resource_name"),
+            workload_id=value.get("workload_id"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -29,4 +31,3 @@ class KubeEvent:
         group = self.api_group or "core"
         name = f"/{self.resource_name}" if self.resource_name else ""
         return f"{self.verb} {group}/{self.resource}{name}"
-

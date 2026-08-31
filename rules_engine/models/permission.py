@@ -33,4 +33,3 @@ class Permission:
         scope = self.namespace or "cluster-wide"
         name = f"/{self.resource_name}" if self.resource_name else ""
         return f"{self.verb} {group}/{self.resource}{name} ({scope})"
-

@@ -1,0 +1,6 @@
+service_id: order-service
+language: Python
+entry_point: service.py
+verification_profile: order-service
+dependencies: [payment-service]
+kubernetes_usage: [get core/configmaps/app-config]

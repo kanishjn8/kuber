@@ -20,17 +20,36 @@ SUPPORTED_VERBS: tuple[str, ...] = (
 
 
 def is_supported_resource(api_group: str, resource: str) -> bool:
-    if api_group == "*" or resource == "*":
+    if api_group == "*":
+        if resource == "*":
+            return True
+        return any(resource in resources for resources in SUPPORTED_RESOURCES.values())
+    if api_group not in SUPPORTED_RESOURCES:
+        return False
+    if resource == "*":
         return True
-    return resource in SUPPORTED_RESOURCES.get(api_group, ())
+    return resource in SUPPORTED_RESOURCES[api_group]
 
 
 def expand_permission(permission: Permission) -> tuple[Permission, ...]:
-    groups = tuple(SUPPORTED_RESOURCES) if permission.api_group == "*" else (permission.api_group,)
+    if permission.api_group == "*" and permission.resource != "*":
+        groups = tuple(
+            group
+            for group, resources in SUPPORTED_RESOURCES.items()
+            if permission.resource in resources
+        )
+    else:
+        groups = (
+            tuple(SUPPORTED_RESOURCES) if permission.api_group == "*" else (permission.api_group,)
+        )
     verbs = SUPPORTED_VERBS if permission.verb == "*" else (permission.verb,)
     expanded: list[Permission] = []
     for group in groups:
-        resources = SUPPORTED_RESOURCES.get(group, ()) if permission.resource == "*" else (permission.resource,)
+        resources = (
+            SUPPORTED_RESOURCES.get(group, ())
+            if permission.resource == "*"
+            else (permission.resource,)
+        )
         for resource in resources:
             for verb in verbs:
                 expanded.append(
@@ -53,4 +72,3 @@ def expand_policy(policy: Policy) -> Policy:
 
 def effective_permission_count(policy: Policy) -> int:
     return len(expand_policy(policy).permissions)
-

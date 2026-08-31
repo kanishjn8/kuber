@@ -1,2 +1,0 @@
-"""Payment controller demo workload."""
-

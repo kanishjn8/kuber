@@ -34,4 +34,3 @@ def score_policy(policy: Policy) -> RiskAssessment:
     )
     uncapped = sum(finding.points for finding in findings)
     return RiskAssessment(min(100, uncapped), uncapped, findings)
-

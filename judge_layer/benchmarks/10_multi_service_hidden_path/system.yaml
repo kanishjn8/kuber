@@ -1,0 +1,2 @@
+workers: 3
+cases: [01_config_reader, 03_job_controller, 07_hidden_path]

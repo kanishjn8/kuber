@@ -1,23 +1,48 @@
 from __future__ import annotations
 
-from judge_layer.evaluation.metrics import EvaluationSummary
+from judge_layer.evaluation.metrics import CaseResultRow, EvaluationSummary
 
 
 def console_table(baseline: EvaluationSummary, kuber: EvaluationSummary) -> str:
     rows = [
-        ("Functional success", f"{baseline.functional_successes}/{baseline.cases}", f"{kuber.functional_successes}/{kuber.cases}"),
-        ("Validated Risk Reduction", f"{baseline.average_validated_risk_reduction:.1f}%", f"{kuber.average_validated_risk_reduction:.1f}%"),
-        ("Raw privilege reduction", f"{baseline.average_raw_permission_reduction:.1f}%", f"{kuber.average_raw_permission_reduction:.1f}%"),
-        ("Cluster-wide grants left", str(baseline.cluster_wide_grants_remaining), str(kuber.cluster_wide_grants_remaining)),
+        (
+            "Functional success",
+            f"{baseline.functional_successes}/{baseline.cases}",
+            f"{kuber.functional_successes}/{kuber.cases}",
+        ),
+        (
+            "Validated Risk Reduction",
+            f"{baseline.average_validated_risk_reduction:.1f}%",
+            f"{kuber.average_validated_risk_reduction:.1f}%",
+        ),
+        (
+            "Raw privilege reduction",
+            f"{baseline.average_raw_permission_reduction:.1f}%",
+            f"{kuber.average_raw_permission_reduction:.1f}%",
+        ),
+        (
+            "Cluster-wide grants left",
+            str(baseline.cluster_wide_grants_remaining),
+            str(kuber.cluster_wide_grants_remaining),
+        ),
         ("Repair iterations", str(baseline.repair_iterations), str(kuber.repair_iterations)),
     ]
-    lines = ["Kuber Evaluation", "=" * 72, "", f"Cases: {kuber.cases}", "", f"{'Metric':32} {'Baseline':>16} {'Kuber':>16}"]
+    lines = [
+        "Kuber Evaluation",
+        "=" * 72,
+        "",
+        f"Cases: {kuber.cases}",
+        "",
+        f"{'Metric':32} {'Baseline':>16} {'Kuber':>16}",
+    ]
     lines.append("-" * 72)
     lines.extend(f"{label:32} {left:>16} {right:>16}" for label, left, right in rows)
     return "\n".join(lines)
 
 
-def markdown_report(baseline: EvaluationSummary, kuber: EvaluationSummary, cases: list[dict[str, object]]) -> str:
+def markdown_report(
+    baseline: EvaluationSummary, kuber: EvaluationSummary, cases: list[CaseResultRow]
+) -> str:
     lines = [
         "# Kuber evaluation report",
         "",
@@ -38,13 +63,24 @@ def markdown_report(baseline: EvaluationSummary, kuber: EvaluationSummary, cases
         "",
         "## Cases",
         "",
-        "| Case | Baseline | Kuber | Kuber repairs |",
-        "|---|---:|---:|---:|",
+        "| Case | Baseline | Baseline permissions | Baseline risk | Baseline VRR | Kuber | Kuber permissions | Kuber risk | Kuber VRR | Repairs | Trace |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for case in cases:
-        baseline_ok = "PASS" if case["baseline"]["functional_success"] else "FAIL"  # type: ignore[index]
-        kuber_ok = "PASS" if case["kuber"]["functional_success"] else "FAIL"  # type: ignore[index]
-        repairs = case["kuber"]["repair_iterations"]  # type: ignore[index]
-        lines.append(f"| {case['name']} | {baseline_ok} | {kuber_ok} | {repairs} |")
+        baseline_ok = "PASS" if case["baseline"]["functional_success"] else "FAIL"
+        kuber_ok = "PASS" if case["kuber"]["functional_success"] else "FAIL"
+        repairs = case["kuber"]["repair_iterations"]
+        trace = f"[trajectory](../trajectories/evaluation-{case['id']}.md)"
+        lines.append(
+            f"| {case['name']} "
+            f"| {baseline_ok} "
+            f"| {case['baseline']['initial_permissions']} → {case['baseline']['final_permissions']} "
+            f"| {case['baseline']['initial_risk']} → {case['baseline']['final_risk']} "
+            f"| {case['baseline']['validated_risk_reduction']:.1f}% "
+            f"| {kuber_ok} "
+            f"| {case['kuber']['initial_permissions']} → {case['kuber']['final_permissions']} "
+            f"| {case['kuber']['initial_risk']} → {case['kuber']['final_risk']} "
+            f"| {case['kuber']['validated_risk_reduction']:.1f}% "
+            f"| {repairs} | {trace} |"
+        )
     return "\n".join(lines) + "\n"
-

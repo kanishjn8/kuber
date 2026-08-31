@@ -14,7 +14,9 @@ class CandidateReduction:
     risk_value: int
 
 
-def candidate_reductions(policy: Policy, observed: tuple[KubeEvent, ...]) -> tuple[CandidateReduction, ...]:
+def candidate_reductions(
+    policy: Policy, observed: tuple[KubeEvent, ...]
+) -> tuple[CandidateReduction, ...]:
     reductions: list[CandidateReduction] = []
     for permission in policy.permissions:
         single = policy.with_permissions([permission])

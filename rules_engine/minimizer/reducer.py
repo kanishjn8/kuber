@@ -2,13 +2,22 @@ from __future__ import annotations
 
 from rules_engine.models import KubeEvent, Permission, Policy
 from rules_engine.rbac.authorization import is_authorized
+from rules_engine.rbac.canonicalizer import SUPPORTED_VERBS, is_supported_resource
 
 RESOURCE_NAME_SAFE_VERBS = frozenset({"get", "update", "patch", "delete"})
 
 
 def event_permission(event: KubeEvent) -> Permission:
+    if event.verb not in SUPPORTED_VERBS:
+        raise ValueError(f"unsupported observed verb: {event.verb}")
+    if not is_supported_resource(event.api_group, event.resource):
+        raise ValueError(
+            f"unsupported observed resource: {event.api_group or 'core'}/{event.resource}"
+        )
     name = event.resource_name if event.verb in RESOURCE_NAME_SAFE_VERBS else None
-    return Permission(event.api_group, event.resource, event.verb, event.namespace, name, "Kuber/verified")
+    return Permission(
+        event.api_group, event.resource, event.verb, event.namespace, name, "Kuber/verified"
+    )
 
 
 def observed_only_policy(current: Policy, observed: tuple[KubeEvent, ...]) -> Policy:
@@ -26,13 +35,16 @@ def observed_only_policy(current: Policy, observed: tuple[KubeEvent, ...]) -> Po
     )
 
 
-def repair_policy(candidate: Policy, missing_events: tuple[KubeEvent, ...], original: Policy) -> Policy:
+def repair_policy(
+    candidate: Policy, missing_events: tuple[KubeEvent, ...], original: Policy
+) -> Policy:
     """Add only denied capabilities that the original policy actually allowed."""
 
     additions: list[Permission] = []
     for event in missing_events:
         if not is_authorized(original, event):
-            raise ValueError(f"refusing to invent permission absent from original policy: {event.display()}")
+            raise ValueError(
+                f"refusing to invent permission absent from original policy: {event.display()}"
+            )
         additions.append(event_permission(event))
     return candidate.with_permissions([*candidate.permissions, *additions])
-

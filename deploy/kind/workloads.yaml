@@ -1,0 +1,244 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: api-gateway-sa, namespace: kuber-sandbox}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: auth-service-sa, namespace: kuber-sandbox}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: order-service-sa, namespace: kuber-sandbox}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: payment-service-sa, namespace: kuber-sandbox}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: worker-service-sa, namespace: kuber-sandbox}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: kuber-sandbox
+  labels: {app.kubernetes.io/name: api-gateway}
+  annotations:
+    kuber.dev/source-path: examples/service_catalog/api_gateway
+    kuber.dev/important-paths: service.py,service-context.yaml
+    kuber.dev/verification-profile: api-gateway
+    kuber.dev/dependencies: auth-service,order-service
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: api-gateway}}
+  template:
+    metadata: {labels: {app: api-gateway, app.kubernetes.io/name: api-gateway}}
+    spec:
+      serviceAccountName: api-gateway-sa
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        -
+          name: service
+          image: kuber-reference-workload:dev
+          imagePullPolicy: Never
+          ports: [{containerPort: 8080}]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 300m, memory: 192Mi}
+          env:
+            - {name: SERVICE_ID, value: api-gateway}
+            - name: POD_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+          readinessProbe: {httpGet: {path: /healthz, port: 8080}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: 8080}, initialDelaySeconds: 10}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: kuber-sandbox
+  labels: {app.kubernetes.io/name: auth-service}
+  annotations:
+    kuber.dev/source-path: examples/service_catalog/auth_service
+    kuber.dev/important-paths: service.py,service-context.yaml
+    kuber.dev/verification-profile: auth-service
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: auth-service}}
+  template:
+    metadata: {labels: {app: auth-service, app.kubernetes.io/name: auth-service}}
+    spec:
+      serviceAccountName: auth-service-sa
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: service
+          image: kuber-reference-workload:dev
+          imagePullPolicy: Never
+          ports: [{containerPort: 8080}]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 300m, memory: 192Mi}
+          env:
+            - {name: SERVICE_ID, value: auth-service}
+            - name: POD_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+          readinessProbe: {httpGet: {path: /healthz, port: 8080}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: 8080}, initialDelaySeconds: 10}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: kuber-sandbox
+  labels: {app.kubernetes.io/name: order-service}
+  annotations:
+    kuber.dev/source-path: examples/service_catalog/order_service
+    kuber.dev/important-paths: service.py,service-context.yaml
+    kuber.dev/verification-profile: order-service
+    kuber.dev/dependencies: payment-service
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: order-service}}
+  template:
+    metadata: {labels: {app: order-service, app.kubernetes.io/name: order-service}}
+    spec:
+      serviceAccountName: order-service-sa
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: service
+          image: kuber-reference-workload:dev
+          imagePullPolicy: Never
+          ports: [{containerPort: 8080}]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 300m, memory: 192Mi}
+          env:
+            - {name: SERVICE_ID, value: order-service}
+            - name: POD_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+          readinessProbe: {httpGet: {path: /healthz, port: 8080}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: 8080}, initialDelaySeconds: 10}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: kuber-sandbox
+  labels: {app.kubernetes.io/name: payment-service}
+  annotations:
+    kuber.dev/source-path: examples/service_catalog/payment_service
+    kuber.dev/important-paths: service.py,service-context.yaml
+    kuber.dev/verification-profile: payment-service
+    kuber.dev/dependencies: order-service
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: payment-service}}
+  template:
+    metadata: {labels: {app: payment-service, app.kubernetes.io/name: payment-service}}
+    spec:
+      serviceAccountName: payment-service-sa
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: service
+          image: kuber-reference-workload:dev
+          imagePullPolicy: Never
+          ports: [{containerPort: 8080}]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 300m, memory: 192Mi}
+          env:
+            - {name: SERVICE_ID, value: payment-service}
+            - name: POD_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+          readinessProbe: {httpGet: {path: /healthz, port: 8080}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: 8080}, initialDelaySeconds: 10}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-service
+  namespace: kuber-sandbox
+  labels: {app.kubernetes.io/name: worker-service}
+  annotations:
+    kuber.dev/source-path: examples/service_catalog/worker_service
+    kuber.dev/important-paths: service.py,service-context.yaml
+    kuber.dev/verification-profile: worker-service
+    kuber.dev/dependencies: order-service
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: worker-service}}
+  template:
+    metadata: {labels: {app: worker-service, app.kubernetes.io/name: worker-service}}
+    spec:
+      serviceAccountName: worker-service-sa
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: service
+          image: kuber-reference-workload:dev
+          imagePullPolicy: Never
+          ports: [{containerPort: 8080}]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 300m, memory: 192Mi}
+          env:
+            - {name: SERVICE_ID, value: worker-service}
+            - name: POD_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+          readinessProbe: {httpGet: {path: /healthz, port: 8080}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: 8080}, initialDelaySeconds: 10}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: api-gateway, namespace: kuber-sandbox}
+spec: {selector: {app: api-gateway}, ports: [{port: 8080, targetPort: 8080}]}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: auth-service, namespace: kuber-sandbox}
+spec: {selector: {app: auth-service}, ports: [{port: 8080, targetPort: 8080}]}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: order-service, namespace: kuber-sandbox}
+spec: {selector: {app: order-service}, ports: [{port: 8080, targetPort: 8080}]}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: payment-service, namespace: kuber-sandbox}
+spec: {selector: {app: payment-service}, ports: [{port: 8080, targetPort: 8080}]}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: worker-service, namespace: kuber-sandbox}
+spec: {selector: {app: worker-service}, ports: [{port: 8080, targetPort: 8080}]}

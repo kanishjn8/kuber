@@ -5,4 +5,3 @@ from agent_layer.interfaces.environment import (
 )
 
 __all__ = ["EnvironmentAdapter", "FailureDescription", "VerificationResult"]
-

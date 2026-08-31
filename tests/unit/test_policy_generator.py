@@ -14,7 +14,9 @@ def test_generated_policy_round_trips_without_cross_product_overgrant() -> None:
         service_account="app",
         service_account_namespace="payments",
     )
-    resolved = resolve_effective_policy(parse_rbac(policy_to_yaml(policy)), ServiceAccountRef("app", "payments"))
+    resolved = resolve_effective_policy(
+        parse_rbac(policy_to_yaml(policy)), ServiceAccountRef("app", "payments")
+    )
     keys = {item.key() for item in resolved.permissions}
     assert ("", "pods", "list", "payments", None) in keys
     assert ("", "configmaps", "get", "payments", "app-config") in keys
@@ -23,4 +25,3 @@ def test_generated_policy_round_trips_without_cross_product_overgrant() -> None:
 
 def test_empty_policy_generates_no_grants() -> None:
     assert policy_to_yaml(Policy()).startswith("# Empty policy")
-

@@ -21,14 +21,24 @@ def _high_risk_count(policy: Policy) -> int:
     )
 
 
-def _metrics(initial: Policy, final: Policy, success: bool, runtime: float, *, incorrect: int = 0, repairs: int = 0) -> SystemCaseMetrics:
+def _metrics(
+    initial: Policy,
+    final: Policy,
+    success: bool,
+    runtime: float,
+    *,
+    incorrect: int = 0,
+    repairs: int = 0,
+) -> SystemCaseMetrics:
     initial_risk = score_policy(initial).score
     final_risk = score_policy(final).score
     risk_reduction = 100 * (initial_risk - final_risk) / initial_risk if initial_risk else 0.0
     initial_count = effective_permission_count(initial)
     final_count = effective_permission_count(final)
     raw_reduction = 100 * (initial_count - final_count) / initial_count if initial_count else 0.0
-    cluster_wide = sum(permission.namespace is None for permission in expand_policy(final).permissions)
+    cluster_wide = sum(
+        permission.namespace is None for permission in expand_policy(final).permissions
+    )
     return SystemCaseMetrics(
         success,
         initial_risk,
@@ -56,7 +66,9 @@ def evaluate_baseline(case: BenchmarkCase) -> tuple[Policy, SystemCaseMetrics]:
     return candidate, _metrics(case.initial_policy, candidate, result.passed, elapsed)
 
 
-def evaluate_kuber(case: BenchmarkCase, orchestrator: KuberOrchestrator) -> tuple[Policy, SystemCaseMetrics]:
+def evaluate_kuber(
+    case: BenchmarkCase, orchestrator: KuberOrchestrator
+) -> tuple[Policy, SystemCaseMetrics]:
     environment = SimulatorEnvironment(case)
     started = perf_counter()
     result = orchestrator.run(environment, run_id=f"evaluation-{case.identifier}")
@@ -69,4 +81,3 @@ def evaluate_kuber(case: BenchmarkCase, orchestrator: KuberOrchestrator) -> tupl
         incorrect=result.incorrect_removals,
         repairs=result.repair_iterations,
     )
-

@@ -37,10 +37,36 @@ subjects:
     [
         ("kind: Role\nmetadata: {name: x, namespace: n}\nrules: [", RbacParseError),
         ("kind: Deployment\nmetadata: {name: x}", RbacParseError),
-        ("kind: Role\nmetadata: {name: x, namespace: n}\nrules: [{apiGroups: [''], resources: [nodes], verbs: [get]}]", UnsupportedResourceError),
+        (
+            "kind: Role\nmetadata: {name: x, namespace: n}\nrules: [{apiGroups: [''], resources: [nodes], verbs: [get]}]",
+            UnsupportedResourceError,
+        ),
+        (
+            "kind: Role\nmetadata: {name: '', namespace: n}\nrules: []",
+            RbacParseError,
+        ),
+        (
+            "kind: Role\nmetadata: {name: x, namespace: n}\nrules: [{apiGroups: [''], resources: [pods], verbs: [get], resourceNames: pod-1}]",
+            RbacParseError,
+        ),
+        (
+            "kind: Role\nmetadata: {name: x, namespace: n}\nrules: [{apiGroups: ['*'], resources: [nodes], verbs: [get]}]",
+            UnsupportedResourceError,
+        ),
+        (
+            "kind: Role\nmetadata: {name: x, namespace: n}\nrules: [{apiGroups: [example.io], resources: ['*'], verbs: [get]}]",
+            UnsupportedResourceError,
+        ),
+        (
+            "kind: ClusterRoleBinding\nmetadata: {name: bad}\nroleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: reader}",
+            RbacParseError,
+        ),
+        (
+            "kind: RoleBinding\nmetadata: {name: bad, namespace: n}\nroleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: reader}\nsubjects: [{kind: ServiceAccount, name: ''}]",
+            RbacParseError,
+        ),
     ],
 )
 def test_rejects_invalid_or_unsupported_input(manifest: str, error: type[Exception]) -> None:
     with pytest.raises(error):
         parse_rbac(manifest)
-

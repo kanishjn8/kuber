@@ -1,2 +1,0 @@
-"""Kuber command-line package."""
-

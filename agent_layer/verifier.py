@@ -24,4 +24,3 @@ class VerifierAgent:
         if not failure.authorization_denial or not failure.missing_events:
             raise ValueError("failure cannot be repaired deterministically")
         return repair_policy(candidate, failure.missing_events, original)
-

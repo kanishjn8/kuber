@@ -6,4 +6,3 @@ def run_observed_only(current: Policy, observed: tuple[KubeEvent, ...]) -> Polic
     """Primary baseline: minimize to observations and skip all verification."""
 
     return observed_only_policy(current, observed)
-

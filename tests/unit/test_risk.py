@@ -20,4 +20,3 @@ def test_narrow_read_is_lower_risk() -> None:
     broad = Policy((Permission("", "secrets", "*", None),))
     narrow = Policy((Permission("", "configmaps", "get", "payments", "app-config"),))
     assert score_policy(narrow).score < score_policy(broad).score
-

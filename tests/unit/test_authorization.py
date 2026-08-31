@@ -32,4 +32,3 @@ def test_resource_names_match_named_requests(verb: str) -> None:
 def test_missing_verb_is_denied() -> None:
     policy = Policy((Permission("", "pods", "get", "payments"),))
     assert not is_authorized(policy, KubeEvent("", "pods", "list", "payments"))
-

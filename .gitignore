@@ -32,9 +32,9 @@ kubeconfig.*
 *.log
 
 # Generated Kuber output
-artifacts/trajectories/*.jsonl
-artifacts/trajectories/*.md
-artifacts/evaluation/*.json
-artifacts/evaluation/*.csv
-artifacts/evaluation/report.md
-artifacts/policies/*.yaml
+artifacts/trajectories/
+artifacts/evaluation/
+artifacts/policies/
+artifacts/runs/
+artifacts/experiments/
+artifacts/state/

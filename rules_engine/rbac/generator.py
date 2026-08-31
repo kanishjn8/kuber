@@ -75,4 +75,8 @@ def policy_to_documents(policy: Policy) -> list[dict[str, Any]]:
 
 def policy_to_yaml(policy: Policy) -> str:
     documents = policy_to_documents(policy)
-    return yaml.safe_dump_all(documents, sort_keys=False) if documents else "# Empty policy: no RBAC grants\n"
+    return (
+        yaml.safe_dump_all(documents, sort_keys=False)
+        if documents
+        else "# Empty policy: no RBAC grants\n"
+    )
